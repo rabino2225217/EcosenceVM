@@ -13,11 +13,17 @@ export default function ProtectedRoute({
   requireStaff?: boolean;
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const [checked, setChecked] = React.useState(false);
   const [authorized, setAuthorized] = React.useState(false);
+  const hasChecked = React.useRef(false);
 
   React.useEffect(() => {
+    // Only check once per mount
+    if (hasChecked.current) {
+      return;
+    }
+
+    hasChecked.current = true;
     let active = true;
 
     const verifyAuth = async () => {
@@ -27,19 +33,34 @@ export default function ProtectedRoute({
         });
 
         if (!res.ok) {
-          if (active) navigate("/login", { replace: true });
+          if (active) {
+            setChecked(true);
+            setAuthorized(false);
+            navigate("/login", { 
+              replace: true,
+              state: { shouldCheck: false } // Prevent login page from checking session again
+            });
+          }
           return;
         }
 
         const user = await res.json();
 
         if (requireAdmin && user.role !== "Admin") {
-          if (active) navigate("/unauthorized", { replace: true });
+          if (active) {
+            setChecked(true);
+            setAuthorized(false);
+            navigate("/unauthorized", { replace: true });
+          }
           return;
         }
 
         if (requireStaff && !["DENR staff", "Admin"].includes(user.role)) {
-          if (active) navigate("/unauthorized", { replace: true });
+          if (active) {
+            setChecked(true);
+            setAuthorized(false);
+            navigate("/unauthorized", { replace: true });
+          }
           return;
         }
 
@@ -52,24 +73,29 @@ export default function ProtectedRoute({
           }
         }
 
-        if (active) setAuthorized(true);
+        if (active) {
+          setAuthorized(true);
+          setChecked(true);
+        }
       } catch (err) {
         console.error("Auth verification error:", err);
-        if (active) navigate("/login", { replace: true });
-      } finally {
-        if (active) setChecked(true);
+        if (active) {
+          setChecked(true);
+          setAuthorized(false);
+          navigate("/login", { 
+            replace: true,
+            state: { shouldCheck: false } // Prevent login page from checking session again
+          });
+        }
       }
     };
 
-    // Only verify if not already checked and authorized
-    if (!checked && !authorized) {
-      verifyAuth();
-    }
+    verifyAuth();
 
     return () => {
       active = false;
     };
-  }, [navigate, requireAdmin, requireStaff]);
+  }, []); // Empty dependency array - only run once on mount
 
   if (!checked) {
     return (
@@ -80,5 +106,9 @@ export default function ProtectedRoute({
     );
   }
 
-  return authorized ? <>{children}</> : null;
+  if (!authorized) {
+    return null; // Will redirect via navigate
+  }
+
+  return <>{children}</>;
 }

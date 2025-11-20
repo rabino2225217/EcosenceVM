@@ -17,7 +17,9 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const fromRegister = location.state?.fromRegister || false;
-  const [checking, setChecking] = useState(!fromRegister);
+  // Don't check session if we were redirected here (no state means likely a redirect)
+  const shouldCheckSession = fromRegister || location.state?.shouldCheck !== false;
+  const [checking, setChecking] = useState(shouldCheckSession);
   const hasCheckedSession = React.useRef(false);
 
   React.useEffect(() => {
@@ -26,9 +28,9 @@ export default function Login() {
 
   //Check if there are existing session and then navigate accordingly
   React.useEffect(() => {
-    // Skip if already checked or coming from register
-    if (hasCheckedSession.current || fromRegister) {
-      if (fromRegister) {
+    // Skip if already checked or shouldn't check
+    if (hasCheckedSession.current || !shouldCheckSession) {
+      if (!shouldCheckSession) {
         setChecking(false);
       }
       return;
@@ -63,7 +65,7 @@ export default function Login() {
     return () => {
       active = false;
     };
-  }, [fromRegister, navigate, API_URL]);
+  }, [shouldCheckSession, navigate, API_URL]);
 
   if (checking) {
     return (
@@ -91,8 +93,16 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
 
-        socket.connect();
+        // Reset the session check ref so it can check again after login
+        hasCheckedSession.current = false;
+        
+        try {
+          socket.connect();
+        } catch (socketErr) {
+          console.error("Socket connection error:", socketErr);
+        }
 
+        // Use replace: true to prevent back navigation to login
         navigate(data.redirect, { replace: true });
       } else {
         const errorText = await response.text();
