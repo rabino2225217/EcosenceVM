@@ -1,0 +1,13 @@
+flask
+flask-cors
+ultralytics
+opencv-python-headless
+numpy
+rasterio
+pyproj
+geopandas
+python-dotenv
+torch
+torchvision
+ensemble-boxes
+gunicorn
