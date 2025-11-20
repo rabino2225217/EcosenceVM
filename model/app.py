@@ -45,6 +45,15 @@ COLOR_MAP = {
     "default": (255, 255, 255)     # #FFFFFFFF 
 }
 
+#Health check endpoint
+@app.route("/", methods=["GET"])
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "healthy",
+        "models_loaded": list(MODELS.keys())
+    }), 200
+
 #YOLO prediction endpoint
 @app.route("/predict", methods=["POST"])
 def predict():

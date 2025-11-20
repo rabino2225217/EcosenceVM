@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdal-bin \
     libgeos-dev \
     libproj-dev \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \

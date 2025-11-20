@@ -30,6 +30,8 @@ let corsOptions = {
   credentials: true
 };
 
+// Define allowedOrigins for Socket.IO (always needed)
+let allowedOrigins;
 if (clientOrigin === "*") {
   // Allow all origins when using nginx reverse proxy
   // Use function to dynamically allow request origin
@@ -37,8 +39,10 @@ if (clientOrigin === "*") {
     // Allow requests with credentials from any origin when using nginx
     callback(null, true);
   };
+  // For Socket.IO, use true to allow all origins
+  allowedOrigins = true;
 } else {
-  const allowedOrigins = clientOrigin
+  allowedOrigins = clientOrigin
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
@@ -112,6 +116,11 @@ io.on("connection", (socket) => {
 //Make io accessible in routes/controllers
 app.set('io', io);
 
+//Health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'healthy', service: 'ecosense-server' });
+});
+
 //Admin routes
 app.use('/admin/users', require('./routes/admin/userRoutes'));
 app.use('/admin/projects', require('./routes/admin/manageProjectRoutes'));
@@ -159,5 +168,5 @@ setInterval(cleanTempFiles, 3 * 60 * 60 * 1000);
 //Start server
 server.listen(port, host, () => {
   console.log(`Server running at http://${host}:${port}`);
-  console.log(`Allowed origins: ${allowedOrigins.join(", ")}`);
+  console.log(`Allowed origins: ${allowedOrigins === true ? "* (all)" : allowedOrigins.join(", ")}`);
 });

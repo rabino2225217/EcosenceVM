@@ -5,10 +5,8 @@ services:
       - "80:80"
     restart: unless-stopped
     depends_on:
-      frontend:
-        condition: service_started
-      server:
-        condition: service_started
+      - frontend
+      - server
     networks:
       - ecosense
     healthcheck:
@@ -16,7 +14,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
 
   frontend:
     build:
