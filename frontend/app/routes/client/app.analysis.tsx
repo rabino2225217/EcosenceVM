@@ -38,6 +38,8 @@ import { Skeleton } from "../../components/ui/skeleton";
 import { useAnalysisStore } from "./analysis-store";
 import { Slider } from "../../components/ui/slider";
 import { useQuickGuide } from "../../components/client/quick-guide-modal";
+import { API_URL } from "../../utils/api";
+
 type DroneImage = {
   file: File;
   url: string;
@@ -63,8 +65,6 @@ export default function AnalysisPage() {
   const [zoom, setZoom] = React.useState(1);
   const [confidence, setConfidence] = React.useState([0.5]);
   const [iou, setIou] = React.useState([0.5]);
-
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const openPicker = () => inputRef.current?.click();
 

@@ -1,6 +1,7 @@
 import socket from "../../services/socket";
 import * as React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { API_URL } from "../../utils/api";
 import {
   Sidebar,
   SidebarContent,
@@ -91,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
         if (res.ok) {
@@ -162,7 +163,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/project/${selectedProjectId}`,
+          `${API_URL}/project/${selectedProjectId}`,
           {
             credentials: "include",
           }
@@ -308,7 +309,7 @@ export function AppSidebar({ user }: { user: User | null }) {
     }
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

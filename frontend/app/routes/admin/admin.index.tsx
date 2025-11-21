@@ -8,6 +8,7 @@ import DeleteUserModal from "../../components/admin/delete-user-modal";
 import { Switch } from "../../components/ui/switch";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
+import { API_URL } from "../../utils/api";
 
 type User = {
   _id: string;
@@ -28,8 +29,6 @@ export default function AdminIndex() {
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [tab, setTab] = useState<"ALL" | "PENDING">("ALL");
-
-  const API_URL = import.meta.env.VITE_API_URL;
 
   //Socket connection
   useEffect(() => {

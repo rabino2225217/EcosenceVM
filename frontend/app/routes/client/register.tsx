@@ -4,7 +4,7 @@ import { Check, X, CircleAlert, CheckCircle2, Loader } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { motion, AnimatePresence } from "framer-motion";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../../utils/api";
 
 export default function Register() {
   const [username, setUsername] = useState("");

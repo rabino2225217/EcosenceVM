@@ -4,7 +4,7 @@ services:
       context: ./frontend
       target: runtime
       args:
-        # Direct connection to server
+        # API URL will be auto-detected from browser origin, this is just a fallback
         VITE_API_URL: ${VITE_API_URL:-http://localhost:4000}
     env_file:
       - ./frontend/.env
@@ -32,8 +32,8 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: ${SERVER_PORT:-4000}
-      # Frontend origin for CORS
-      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5173}
+      # Frontend origin for CORS - use * to allow any origin (auto-detected)
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-*}
       MONGODB_URI: ${MONGODB_URI:-mongodb+srv://DENR:DENRpwd@ecosense.c8pm9kc.mongodb.net/EcoSense}
       SESSION_SECRET: ${SESSION_SECRET:-ecosense-scrt-ky}
       MODEL_API_URL: ${MODEL_API_URL:-http://model:5001/predict}

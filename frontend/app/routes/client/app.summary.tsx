@@ -43,7 +43,7 @@ type SummaryRow = {
   date?: string;
 };
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../../utils/api";
 
 export default function AppSummary() {
   const { id: projectId } = useParams<{ id: string }>();

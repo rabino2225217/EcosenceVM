@@ -23,7 +23,7 @@ import { Polygon, MultiPolygon, Geometry, Point } from "ol/geom";
 import Feature from "ol/Feature";
 import type { FeatureLike } from "ol/Feature";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../../utils/api";
 const DEFAULT_CENTER: [number, number] = [120.6, 16.42];
 const DEFAULT_ZOOM = 11;
 const CAR_EXTENT: [number, number, number, number] = [

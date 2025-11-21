@@ -19,7 +19,7 @@ import EditProjectModal from "../../components/admin/edit-project-modal";
 import DeleteProjectModal from "../../components/admin/delete-project-modal";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../../utils/api";
 
 export default function AppProjects() {
   const [loading, setLoading] = useState(true);

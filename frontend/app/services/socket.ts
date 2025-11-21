@@ -1,9 +1,8 @@
 import { io, Socket } from "socket.io-client";
+import { getApiUrl } from "../utils/api";
 
-const API_URL = import.meta.env.VITE_API_URL; 
-
-// Connect directly to server (no nginx proxy)
-const socket: Socket = io(API_URL, { 
+// Connect directly to server (auto-detects URL from current origin)
+const socket: Socket = io(getApiUrl(), { 
   withCredentials: true,
   transports: ["websocket"], 
   autoConnect: false,

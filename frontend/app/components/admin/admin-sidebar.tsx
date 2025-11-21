@@ -1,6 +1,7 @@
 import socket from "../../services/socket";
 import * as React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { API_URL } from "../../utils/api";
 import {
   Sidebar,
   SidebarContent,
@@ -76,7 +77,7 @@ export function AppSidebar() {
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
         if (res.ok) {
@@ -93,7 +94,7 @@ export function AppSidebar() {
   //Handle logout
   const handleLogout = async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

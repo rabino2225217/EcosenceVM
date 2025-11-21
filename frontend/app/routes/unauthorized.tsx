@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../utils/api";
 
 export default function Unauthorized() {
   const [homePath, setHomePath] = React.useState("/app");
@@ -7,7 +8,7 @@ export default function Unauthorized() {
   React.useEffect(() => {
     const checkRole = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
         if (!res.ok) return;

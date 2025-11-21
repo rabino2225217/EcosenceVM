@@ -2,6 +2,7 @@ import socket from "../services/socket";
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Loader } from "lucide-react";
+import { API_URL } from "../utils/api";
 
 export default function ProtectedRoute({
   children,
@@ -22,7 +23,7 @@ export default function ProtectedRoute({
 
     const verifyAuth = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
 

@@ -7,7 +7,7 @@ import AddLandCoverModal from "../../components/admin/add-landcover-modal";
 import EditLandCoverModal from "../../components/admin/edit-landcover-modal";
 import DeleteLandCoverModal from "../../components/admin/delete-landcover-modal";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../../utils/api";
 
 export default function AdminLandCover() {
   const [landCovers, setLandCovers] = React.useState<any[]>([]);

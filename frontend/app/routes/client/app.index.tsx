@@ -25,6 +25,7 @@ import RenameProjectModal from "../../components/client/rename-project-modal";
 import DeleteProjectModal from "../../components/client/delete-project-modal";
 import { useQuickGuide } from "~/components/client/quick-guide-modal";
 import React from "react";
+import { API_URL } from "../../utils/api";
 
 type Project = {
   _id: string;
@@ -44,8 +45,6 @@ export default function AppIndex() {
   const [sortBy, setSortBy] = useState<
     "name-asc" | "name-desc" | "date-asc" | "date-desc" | null
   >("date-desc");
-
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const { setCurrentSection } = useQuickGuide();
 
