@@ -63,7 +63,9 @@ const sessionMiddleware = session({
   cookie: {
     secure: false,
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, 
+    maxAge: 1000 * 60 * 60 * 24,
+    sameSite: 'lax', // Required for cookies through nginx proxy
+    path: '/', // Ensure cookie is available for all paths
   },
 });
 
