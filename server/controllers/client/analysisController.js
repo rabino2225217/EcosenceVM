@@ -13,6 +13,18 @@ const MODEL_API_URL =
 exports.analyzeImage = async (req, res) => {
   const tempFile = req.file?.path;
   try {
+    // Verify file exists and is readable
+    if (tempFile && !fs.existsSync(tempFile)) {
+      return res.status(400).json({ error: "Uploaded file not found." });
+    }
+    if (tempFile) {
+      try {
+        fs.accessSync(tempFile, fs.constants.R_OK);
+      } catch (err) {
+        console.error("File permission error:", err);
+        return res.status(500).json({ error: "File permission error. Please check uploads directory permissions." });
+      }
+    }
     const {
       project_id: projectIdRaw,
       model: modelKey,
@@ -31,6 +43,14 @@ exports.analyzeImage = async (req, res) => {
       return res.status(404).json({ error: "Project does not exist." });
 
     //Prepare stream for Flask
+    // Ensure file is readable before creating stream
+    try {
+      fs.accessSync(tempFile, fs.constants.R_OK);
+    } catch (err) {
+      console.error("Cannot read uploaded file:", err);
+      return res.status(500).json({ error: "Cannot read uploaded file. Permission issue." });
+    }
+    
     const formData = new FormData();
     formData.append("file", fs.createReadStream(tempFile));
     formData.append("model", modelKey);

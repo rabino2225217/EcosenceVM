@@ -138,7 +138,14 @@ app.use('/summary', require('./routes/client/summaryRoutes'));
 const tempPath = path.join(__dirname, "uploads/temp");
 
 if (!fs.existsSync(tempPath)) {
-  fs.mkdirSync(tempPath, { recursive: true });
+  fs.mkdirSync(tempPath, { recursive: true, mode: 0o755 });
+} else {
+  // Ensure directory is writable (fix permissions if needed)
+  try {
+    fs.chmodSync(tempPath, 0o755);
+  } catch (err) {
+    console.warn("Could not set permissions on temp directory:", err.message);
+  }
 }
 
 const cleanTempFiles = () => {

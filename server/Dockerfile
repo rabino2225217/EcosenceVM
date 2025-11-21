@@ -14,6 +14,11 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY . .
 RUN chown -R app:app /app
 
+# Ensure uploads directory exists with proper permissions
+RUN mkdir -p /app/uploads/temp && \
+    chown -R app:app /app/uploads && \
+    chmod -R 755 /app/uploads
+
 USER app
 EXPOSE 4000
 
