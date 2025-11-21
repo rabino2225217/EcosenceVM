@@ -24,56 +24,29 @@ export default function Login() {
   }, []);
 
   //Check if there are existing session and then navigate accordingly
-  const hasCheckedSession = React.useRef(false);
   React.useEffect(() => {
-    if (fromRegister) {
-      setChecking(false);
-      return;
-    }
-
-    // Only check once per component mount
-    if (hasCheckedSession.current) {
-      return;
-    }
-    hasCheckedSession.current = true;
-
-    let active = true;
-    let mounted = true;
+    if (fromRegister) return;
 
     const checkSession = async () => {
-      if (!mounted || !active) return;
-
       try {
         const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
-        
-        if (!mounted || !active) return;
-
         if (res.ok) {
           const data = await res.json();
-          if (active && mounted) {
-            navigate(data.role === "Admin" ? "/admin" : "/app", {
-              replace: true,
-            });
-          }
+          navigate(data.role === "Admin" ? "/admin" : "/app", {
+            replace: true,
+          });
           return;
         }
       } catch (err) {
         console.error("Session check failed:", err);
       } finally {
-        if (active && mounted) {
-          setChecking(false);
-        }
+        setChecking(false);
       }
     };
 
     checkSession();
-
-    return () => {
-      active = false;
-      mounted = false;
-    };
   }, [navigate, fromRegister]);
 
   if (checking) {

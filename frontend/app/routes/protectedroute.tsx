@@ -13,78 +13,45 @@ export default function ProtectedRoute({
   requireStaff?: boolean;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [checked, setChecked] = React.useState(false);
   const [authorized, setAuthorized] = React.useState(false);
-  const hasRun = React.useRef(false);
 
   React.useEffect(() => {
-    // Only run once per component mount
-    if (hasRun.current) {
-      return;
-    }
-    hasRun.current = true;
-
     let active = true;
 
     const verifyAuth = async () => {
-      if (!active) return;
-
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
           credentials: "include",
         });
 
-        if (!active) return;
-
         if (!res.ok) {
-          if (active) {
-            setChecked(true);
-            setAuthorized(false);
-            navigate("/login", { replace: true });
-          }
+          if (active) navigate("/login", { replace: true });
           return;
         }
 
         const user = await res.json();
 
-        if (!active) return;
-
         if (requireAdmin && user.role !== "Admin") {
-          if (active) {
-            setChecked(true);
-            setAuthorized(false);
-            navigate("/unauthorized", { replace: true });
-          }
+          if (active) navigate("/unauthorized", { replace: true });
           return;
         }
 
         if (requireStaff && !["DENR staff", "Admin"].includes(user.role)) {
-          if (active) {
-            setChecked(true);
-            setAuthorized(false);
-            navigate("/unauthorized", { replace: true });
-          }
+          if (active) navigate("/unauthorized", { replace: true });
           return;
         }
 
         if (active && !socket.connected) {
-          try {
-            socket.connect();
-          } catch (socketErr) {
-            console.error("Socket connection error:", socketErr);
-          }
+          socket.connect();
         }
 
-        if (active) {
-          setAuthorized(true);
-          setChecked(true);
-        }
+        if (active) setAuthorized(true);
       } catch (err) {
-        if (active) {
-          setChecked(true);
-          setAuthorized(false);
-          navigate("/login", { replace: true });
-        }
+        if (active) navigate("/login", { replace: true });
+      } finally {
+        if (active) setChecked(true);
       }
     };
 
@@ -93,8 +60,7 @@ export default function ProtectedRoute({
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array - only run once on mount
+  }, [navigate, location.pathname, requireAdmin, requireStaff]);
 
   if (!checked) {
     return (
