@@ -17,10 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const fromRegister = location.state?.fromRegister || false;
-  // Don't check session if we were redirected here (no state means likely a redirect)
-  const shouldCheckSession = fromRegister || location.state?.shouldCheck !== false;
-  const [checking, setChecking] = useState(shouldCheckSession);
-  const hasCheckedSession = React.useRef(false);
+  const [checking, setChecking] = useState(!fromRegister);
 
   React.useEffect(() => {
     document.title = "Login | EcoSense";
@@ -28,23 +25,14 @@ export default function Login() {
 
   //Check if there are existing session and then navigate accordingly
   React.useEffect(() => {
-    // Skip if already checked or shouldn't check
-    if (hasCheckedSession.current || !shouldCheckSession) {
-      if (!shouldCheckSession) {
-        setChecking(false);
-      }
-      return;
-    }
-
-    let active = true;
-    hasCheckedSession.current = true;
+    if (fromRegister) return;
 
     const checkSession = async () => {
       try {
         const res = await fetch(`${API_URL}/auth/me`, {
           credentials: "include",
         });
-        if (res.ok && active) {
+        if (res.ok) {
           const data = await res.json();
           navigate(data.role === "Admin" ? "/admin" : "/app", {
             replace: true,
@@ -54,18 +42,12 @@ export default function Login() {
       } catch (err) {
         console.error("Session check failed:", err);
       } finally {
-        if (active) {
-          setChecking(false);
-        }
+        setChecking(false);
       }
     };
 
     checkSession();
-
-    return () => {
-      active = false;
-    };
-  }, [shouldCheckSession, navigate, API_URL]);
+  }, [navigate, fromRegister]);
 
   if (checking) {
     return (
@@ -93,20 +75,8 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
 
-        // Reset the session check ref so it can check again after login
-        hasCheckedSession.current = false;
-        
-        try {
-          socket.connect();
-        } catch (socketErr) {
-          console.error("Socket connection error:", socketErr);
-        }
+        socket.connect();
 
-        // Small delay to ensure session cookie is set before navigation
-        // This is especially important when going through nginx proxy
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Use replace: true to prevent back navigation to login
         navigate(data.redirect, { replace: true });
       } else {
         const errorText = await response.text();
