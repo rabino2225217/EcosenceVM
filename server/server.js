@@ -61,10 +61,13 @@ const sessionMiddleware = session({
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: mongodb }),
   cookie: {
-    secure: false,
+    secure: false, // Set to true if using HTTPS
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, 
+    maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    sameSite: 'lax', // Allow cookies through nginx proxy
+    path: '/', // Ensure cookie is available for all paths
   },
+  name: 'connect.sid', // Explicit session cookie name
 });
 
 app.use(sessionMiddleware);

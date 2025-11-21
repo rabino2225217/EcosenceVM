@@ -102,6 +102,10 @@ export default function Login() {
           console.error("Socket connection error:", socketErr);
         }
 
+        // Small delay to ensure session cookie is set before navigation
+        // This is especially important when going through nginx proxy
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         // Use replace: true to prevent back navigation to login
         navigate(data.redirect, { replace: true });
       } else {

@@ -28,11 +28,35 @@ export default function ProtectedRoute({
 
     const verifyAuth = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
-          credentials: "include",
-        });
+        // Add a small retry mechanism for VM/proxy environments
+        let res;
+        let retries = 2;
+        
+        while (retries >= 0 && active) {
+          res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+            credentials: "include",
+            cache: "no-store", // Ensure fresh request
+          });
 
-        if (!res.ok) {
+          if (res.ok) {
+            break;
+          }
+          
+          // If 401/403, don't retry - session is invalid
+          if (res.status === 401 || res.status === 403) {
+            break;
+          }
+          
+          // Retry once for network/proxy issues
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            retries--;
+          } else {
+            break;
+          }
+        }
+
+        if (!res || !res.ok) {
           if (active) {
             setChecked(true);
             setAuthorized(false);
