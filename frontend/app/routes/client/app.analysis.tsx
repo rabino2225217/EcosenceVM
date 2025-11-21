@@ -228,11 +228,18 @@ export default function AnalysisPage() {
           if (!response.ok) {
             let message = "Failed to classify image.";
             try {
-              const errorData = await response.json();
-              message = errorData.error || errorData.message || message;
-            } catch {
+              // Read text first, then try to parse as JSON
               const text = await response.text();
-              message = text || message;
+              try {
+                const errorData = JSON.parse(text);
+                message = errorData.error || errorData.message || text || message;
+              } catch {
+                // Not JSON, use text as message
+                message = text || message;
+              }
+            } catch {
+              // If reading fails, use status text
+              message = `HTTP ${response.status}: ${response.statusText}`;
             }
             throw new Error(message);
           }
