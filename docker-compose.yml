@@ -1,33 +1,17 @@
 services:
-  nginx:
-    build: ./nginx
-    ports:
-      - "80:80"
-    restart: unless-stopped
-    depends_on:
-      - frontend
-      - server
-    networks:
-      - ecosense
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   frontend:
     build:
       context: ./frontend
       target: runtime
       args:
-        # Use relative URL - nginx will handle routing
-        VITE_API_URL: ${VITE_API_URL:-/api}
+        # Direct connection to server
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000}
     env_file:
       - ./frontend/.env
     environment:
       PORT: ${FRONTEND_PORT:-5173}
-    expose:
-      - "5173"
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
     restart: unless-stopped
     depends_on:
       server:
@@ -48,8 +32,8 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: ${SERVER_PORT:-4000}
-      # Accept requests from same origin (nginx handles routing)
-      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-*}
+      # Frontend origin for CORS
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5173}
       MONGODB_URI: ${MONGODB_URI:-mongodb+srv://DENR:DENRpwd@ecosense.c8pm9kc.mongodb.net/EcoSense}
       SESSION_SECRET: ${SESSION_SECRET:-ecosense-scrt-ky}
       MODEL_API_URL: ${MODEL_API_URL:-http://model:5001/predict}
@@ -60,8 +44,8 @@ services:
     volumes:
       - ./server/uploads:/app/uploads
       - ./server/active-layer.json:/app/active-layer.json
-    expose:
-      - "4000"
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
     restart: unless-stopped
     depends_on:
       mongo:

@@ -33,10 +33,8 @@ let corsOptions = {
 // Define allowedOrigins for Socket.IO (always needed)
 let allowedOrigins;
 if (clientOrigin === "*") {
-  // Allow all origins when using nginx reverse proxy
-  // Use function to dynamically allow request origin
+  // Allow all origins (for development)
   corsOptions.origin = function (origin, callback) {
-    // Allow requests with credentials from any origin when using nginx
     callback(null, true);
   };
   // For Socket.IO, use true to allow all origins
